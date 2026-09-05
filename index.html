@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PayPilot AI — Agentic Commerce Dashboard</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">◎</span>
+      <div>
+        <h1>PayPilot AI</h1>
+        <p>Agentic Commerce for Smarter Growth</p>
+      </div>
+    </div>
+    <div class="summary-pills" id="summaryPills"></div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>Authorize a New Agent</h2>
+      <form id="agentForm" class="form-grid">
+        <label>Agent name
+          <input type="text" name="name" placeholder="e.g. Grocery Buyer Bot" required />
+        </label>
+        <label>Owner name
+          <input type="text" name="ownerName" placeholder="e.g. Asif Sayyed" required />
+        </label>
+        <label>Per-transaction cap ($)
+          <input type="number" name="perTransactionCap" value="100" min="1" step="0.01" required />
+        </label>
+        <label>Daily spend cap ($)
+          <input type="number" name="dailySpendCap" value="500" min="1" step="0.01" required />
+        </label>
+        <label>Hourly transaction limit
+          <input type="number" name="hourlyTransactionRateLimit" value="5" min="1" step="1" required />
+        </label>
+        <label>Allowed categories (comma-separated, blank = any)
+          <input type="text" name="allowedMerchantCategories" placeholder="software,groceries,office" />
+        </label>
+        <button type="submit">Authorize Agent</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Agents</h2>
+      <div id="agentList" class="card-list"></div>
+    </section>
+
+    <section class="panel wide">
+      <div class="panel-header">
+        <h2>Held for Review</h2>
+        <span class="hint">Transactions the risk engine flagged for a human decision</span>
+      </div>
+      <div id="heldList" class="card-list"></div>
+    </section>
+
+    <section class="panel wide">
+      <div class="panel-header">
+        <h2>Live Ledger</h2>
+        <span class="hint">All transactions, newest first</span>
+      </div>
+      <table class="ledger">
+        <thead>
+          <tr>
+            <th>Time</th><th>Agent</th><th>Merchant</th><th>Category</th>
+            <th>Amount</th><th>Risk</th><th>Status</th><th>Reasons</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

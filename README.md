@@ -1,8 +1,19 @@
 # PayPilot AI — Agentic Commerce for Smarter Growth
 
+![CI](https://github.com/asifsayyed06/PayPilot-AI-Agentic-Commerce-for-Smarter-Growth/actions/workflows/ci.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Node](https://img.shields.io/badge/Node-18%2B-green)
+
 A working full-stack demo of how an AI shopping/purchasing agent can transact
-on a user's behalf within guardrails the user sets — with a transparent,
-rule-based risk engine and a human-in-the-loop approval step for anything risky.
+on a user's behalf **within guardrails the user sets** — backed by a
+transparent, rule-based risk engine and a human-in-the-loop approval step for
+anything risky.
+
+Built to explore a question that's becoming central to fintech and AI
+infrastructure: **as AI agents start paying for things on our behalf, what
+does a safe, auditable payment layer for that actually look like?**
+
+![PayPilot AI Dashboard](assets/dashboard-screenshot.png)
 
 ## What it does
 
@@ -20,32 +31,67 @@ rule-based risk engine and a human-in-the-loop approval step for anything risky.
    instantly** (kill switch), and lets you **simulate agent purchases** to
    see the engine work.
 
+## Why this project
+
+This was built to demonstrate practical, end-to-end engineering ability
+relevant to fintech, agentic AI, and platform-security roles:
+
+- **System design**: a clean separation between identity (JWT), policy
+  (per-agent limits), decisioning (risk engine), and audit (the ledger) —
+  the same layering used in real payment-authorization systems.
+- **Security-mindedness**: signed, short-lived agent tokens; an instant
+  revocation path; and a human-in-the-loop step for anything the rules
+  can't confidently approve.
+- **Explainability over black boxes**: every decision comes with
+  human-readable reasons, not just a score — something regulated systems
+  need in practice.
+- **Testing & CI**: the risk engine has unit tests (`npm test`) that run on
+  every push via GitHub Actions.
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Backend | Node.js, Express |
+| Auth | JSON Web Tokens (`jsonwebtoken`) |
+| Storage | JSON-file-backed store (swappable for Postgres/Mongo) |
+| Frontend | Vanilla HTML/CSS/JS (no build step) |
+| Testing | Node's built-in test runner (`node --test`) |
+| CI | GitHub Actions |
+
 ## Project structure
 
 ```
 PayPilot-AI/
+├── index.html, styles.css, app.js   # Root copies of the frontend, so GitHub Pages can serve them directly
+├── .nojekyll                        # Tells GitHub Pages to skip Jekyll processing
 ├── backend/
-│   ├── server.js           # Express app entrypoint
-│   ├── db.js                # JSON-file-backed store (swap for Postgres later)
-│   ├── riskEngine.js         # Rule-based risk scoring
-│   ├── utils/jwt.js          # Agent identity token signing/verification
+│   ├── server.js                    # Express app entrypoint
+│   ├── db.js                        # JSON-file-backed store (swap for Postgres later)
+│   ├── riskEngine.js                # Rule-based risk scoring
+│   ├── utils/jwt.js                 # Agent identity token signing/verification
+│   ├── tests/riskEngine.test.js     # Unit tests for the risk engine
 │   ├── routes/
-│   │   ├── agents.js         # Authorize / revoke / reactivate agents
-│   │   ├── transactions.js   # Agent payment requests + human approve/decline
-│   │   └── dashboard.js      # Summary stats + purchase simulation
+│   │   ├── agents.js                # Authorize / revoke / reactivate agents
+│   │   ├── transactions.js          # Agent payment requests + human approve/decline
+│   │   └── dashboard.js             # Summary stats + purchase simulation
 │   └── package.json
-├── frontend/
-│   ├── index.html            # Dashboard UI
+├── frontend/                        # Original source copies (kept for the backend to serve locally too)
+│   ├── index.html
 │   ├── styles.css
-│   └── app.js                # Talks to the backend REST API
+│   └── app.js
+├── .github/workflows/ci.yml         # Runs tests on every push/PR
+├── .env.example
+├── LICENSE
 └── README.md
 ```
 
-## Running it
+## Running it locally
 
 ```bash
 cd backend
 npm install
+cp ../.env.example .env   # optional — sets your own JWT secret
 npm start
 ```
 
@@ -55,6 +101,22 @@ build step needed.
 
 Data persists to `backend/data.json` between restarts. Delete that file to
 reset the demo to a clean slate.
+
+### Running the tests
+
+```bash
+cd backend
+npm test
+```
+
+## Live demo on GitHub Pages
+
+The static frontend (`index.html`, `styles.css`, `app.js` at the repo root)
+is deployable directly via GitHub Pages. Note that Pages only serves static
+files — it can't run the Express backend, so a Pages-hosted copy will show
+the UI but won't have live data until the backend is deployed separately
+(e.g. Render, Railway, Fly.io) and `app.js`'s `API` constant is pointed at
+that URL.
 
 ## API overview
 
@@ -93,12 +155,27 @@ black-box model, so every decision can be shown to the human owner:
   a fraction of the per-transaction cap, and elevated velocity even under
   the hard cap.
 
+## Roadmap / possible extensions
+
+- Swap the JSON file store for Postgres with a proper migrations setup
+- Add refresh tokens and per-scope agent permissions
+- Webhook support so merchants can confirm settlement
+- Configurable risk-engine weights per user, not just per agent
+
 ## Notes on this demo
 
-- Uses a flat JSON file for storage to keep setup to `npm install && npm
-  start` — swap `backend/db.js` for a real database in production.
-- The JWT secret in `utils/jwt.js` is a placeholder — set
-  `PAYPILOT_JWT_SECRET` in your environment before deploying anywhere real.
 - This is a demo/hackathon-grade project meant to illustrate the pattern
   (agent identity, guardrails, explainable risk scoring, human-in-the-loop),
   not a PCI-compliant payment processor.
+- The JWT secret has a placeholder default — always set your own via
+  `PAYPILOT_JWT_SECRET` before deploying anywhere real.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+## GitHub Pages / Browser Demo Mode
+
+The dashboard frontend now automatically falls back to **Browser Demo Mode** when the Express API is unavailable (for example, on GitHub Pages). All dashboard buttons remain functional and demo data is stored in the browser's `localStorage`.
+
+For real backend data, run the Express server and serve the frontend from the same origin, or set `window.PAYPILOT_API` before loading `app.js` to point to your deployed API.

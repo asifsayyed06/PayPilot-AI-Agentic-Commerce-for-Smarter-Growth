@@ -137,3 +137,5 @@ table.ledger td.reasons { color: var(--muted); font-size: 11px; max-width: 260px
   .layout { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
 }
+
+.app-notice{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;padding:12px 18px;border:1px solid #35527f;border-radius:10px;background:#101a2d;color:#dbe8ff;box-shadow:0 8px 30px rgba(0,0,0,.35);font-size:14px;max-width:min(90vw,760px);text-align:center}
